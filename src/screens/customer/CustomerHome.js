@@ -33,13 +33,19 @@ export default function CustomerHome() {
 
   React.useEffect(() => {
     const getLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === 'granted') {
-        let location = await Location.getCurrentPositionAsync({});
-        setCustomerLoc({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude
-        });
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          let location = await Location.getCurrentPositionAsync({});
+          setCustomerLoc({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude
+          });
+        } else {
+          alert('Location permission denied. Map features will be limited.');
+        }
+      } catch (e) {
+        alert('Failed to access location: ' + e.message);
       }
     };
     getLocation();

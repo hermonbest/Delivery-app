@@ -23,21 +23,27 @@ export default function DriverDashboard() {
   React.useEffect(() => {
     let watchId;
     const startTracking = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') return;
-
-      watchId = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.Balanced, 
-          timeInterval: 5000, 
-          distanceInterval: 10,
-        },
-        (location) => {
-          const { latitude, longitude } = location.coords;
-          setDriverLoc({ latitude, longitude });
-          updateDriverLocation({ latitude, longitude });
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Location permission denied. Map features will be limited.');
+          return;
         }
-      );
+        watchId = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.Balanced, 
+            timeInterval: 5000, 
+            distanceInterval: 10,
+          },
+          (location) => {
+            const { latitude, longitude } = location.coords;
+            setDriverLoc({ latitude, longitude });
+            updateDriverLocation({ latitude, longitude });
+          }
+        );
+      } catch (e) {
+        alert('Failed to access location: ' + e.message);
+      }
     };
     startTracking();
     return () => watchId && watchId.remove();
@@ -139,14 +145,17 @@ export default function DriverDashboard() {
                   <MapView
                     style={styles.map}
                     initialRegion={{
-                      latitude: 37.78825, // Fallback
-                      longitude: -122.4324, // Fallback
+                      latitude: driverLoc?.latitude ?? 37.78825,
+                      longitude: driverLoc?.longitude ?? -122.4324,
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.01,
                     }}
                     customMapStyle={mapStyle}
                   >
-                    <Marker coordinate={{ latitude: 37.78825, longitude: -122.4324 }}>
+                    <Marker coordinate={{
+                      latitude: driverLoc?.latitude ?? 37.78825,
+                      longitude: driverLoc?.longitude ?? -122.4324,
+                    }}>
                       <View style={styles.driverMarker}>
                         <Ionicons name="car" size={20} color="white" />
                       </View>

@@ -6,6 +6,7 @@ import { COLORS, SHADOWS, SPACING } from '../../constants/theme';
 import { useDeliveryStore } from '../../services/store';
 
 export default function Cart() {
+
   const router = useRouter();
   const { cart, removeFromCart, clearCart, createOrder } = useDeliveryStore();
 
@@ -13,7 +14,9 @@ export default function Cart() {
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
-    
+    await import('expo-haptics').then(Haptics => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    });
     // In a real app, we'd have an address picker here
     const success = await createOrder(cart, total, "123 Premium St"); // Mock address
     if (success) {
@@ -21,6 +24,13 @@ export default function Cart() {
       router.back();
       alert("Order Placed Successfully!");
     }
+  };
+
+  const handleRemove = async (id) => {
+    await import('expo-haptics').then(Haptics => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    });
+    removeFromCart(id);
   };
 
   return (
@@ -57,7 +67,7 @@ export default function Cart() {
               <View style={styles.quantityContainer}>
                 <Text style={styles.quantityText}>x{item.quantity}</Text>
               </View>
-              <TouchableOpacity onPress={() => removeFromCart(item.id)} style={styles.removeButton}>
+              <TouchableOpacity onPress={() => handleRemove(item.id)} style={styles.removeButton}>
                 <Ionicons name="trash-outline" size={20} color={COLORS.error} />
               </TouchableOpacity>
             </View>
@@ -72,10 +82,11 @@ export default function Cart() {
             <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
           </View>
           
-          <TouchableOpacity 
+           <TouchableOpacity 
              style={styles.checkoutButton}
              onPress={handleCheckout}
-          >
+             activeOpacity={0.8}
+           >
              <LinearGradient
                colors={[COLORS.accent, COLORS.accentGradientEnd]}
                style={styles.checkoutGradient}

@@ -14,6 +14,7 @@ export default function LoginScreen() {
   
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [focusedInput, setFocusedInput] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleLogin = async () => {
@@ -62,8 +63,15 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.form}>
-           <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color={COLORS.textDim} />
+           <View style={[
+            styles.inputContainer,
+            focusedInput === 'email' && styles.inputContainerFocused
+           ]}>
+            <Ionicons 
+              name="mail-outline" 
+              size={20} 
+              color={focusedInput === 'email' ? COLORS.accent : COLORS.textDim} 
+            />
             <TextInput
               style={styles.input}
               placeholder="Email Address"
@@ -72,11 +80,20 @@ export default function LoginScreen() {
               autoCapitalize="none"
               value={email}
               onChangeText={setEmail}
+              onFocus={() => setFocusedInput('email')}
+              onBlur={() => setFocusedInput(null)}
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color={COLORS.textDim} />
+          <View style={[
+            styles.inputContainer,
+            focusedInput === 'password' && styles.inputContainerFocused
+          ]}>
+            <Ionicons 
+              name="lock-closed-outline" 
+              size={20} 
+              color={focusedInput === 'password' ? COLORS.accent : COLORS.textDim} 
+            />
             <TextInput
               style={styles.input}
               placeholder="Password"
@@ -84,6 +101,8 @@ export default function LoginScreen() {
               secureTextEntry
               value={password}
               onChangeText={setPassword}
+              onFocus={() => setFocusedInput('password')}
+              onBlur={() => setFocusedInput(null)}
             />
           </View>
 
@@ -165,6 +184,10 @@ const styles = StyleSheet.create({
     height: 60,
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  inputContainerFocused: {
+    borderColor: COLORS.accent,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
   },
   input: {
     flex: 1,

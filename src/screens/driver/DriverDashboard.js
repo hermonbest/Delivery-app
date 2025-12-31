@@ -6,15 +6,17 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { COLORS, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
+import { COLORS, mapStyle, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
 import { useDeliveryStore } from '../../services/store';
 
 export default function DriverDashboard() {
   const router = useRouter();
   const { user, orders, acceptOrder, completeOrder, updateDriverLocation, logout } = useDeliveryStore();
+  const [driverLoc, setDriverLoc] = React.useState(null);
 
   const myJobs = orders.filter(o => o.status === 'ASSIGNED' || o.status === 'ACCEPTED');
 
@@ -32,6 +34,7 @@ export default function DriverDashboard() {
         },
         (location) => {
           const { latitude, longitude } = location.coords;
+          setDriverLoc({ latitude, longitude });
           updateDriverLocation({ latitude, longitude });
         }
       );

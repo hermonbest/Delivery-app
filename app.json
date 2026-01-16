@@ -12,9 +12,9 @@
       "supportsTablet": true
     },
     "android": {
-       "config": {
+      "config": {
         "googleMaps": {
-          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY_HERE" 
+          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY_HERE"
         }
       },
       "adaptiveIcon": {
@@ -48,6 +48,15 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": false
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "bb4f8642-7fdf-4d8f-ba62-a31edade9c62"
+      }
+    },
+    "owner": "heribc"
   }
 }

@@ -6,11 +6,13 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import { Badge } from '../../components/ui/Badge';
-import { COLORS, mapStyle, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
 import { useDeliveryStore } from '../../services/store';
 import { calculateDistance, calculateETA, formatDistance } from '../../utils/gpsUtils';
+
 
 const CATEGORIES = [
   { id: '1', name: 'Pizza', icon: 'pizza-outline' },
@@ -37,6 +39,7 @@ export default function CustomerHome() {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
           let location = await Location.getCurrentPositionAsync({});
+          console.log('[CustomerHome] Got customer location:', location.coords);
           setCustomerLoc({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude
@@ -55,6 +58,7 @@ export default function CustomerHome() {
     let unsubscribe;
     if (activeOrder?.driverId) {
       unsubscribe = subscribeToDriver(activeOrder.driverId, (coords) => {
+        console.log('[CustomerHome] Got driver location:', coords);
         setActiveDriverLoc(coords);
       });
     }
@@ -63,6 +67,7 @@ export default function CustomerHome() {
 
   React.useEffect(() => {
     if (activeDriverLoc && customerLoc) {
+      console.log('[CustomerHome] Calculating ETA with driver:', activeDriverLoc, 'customer:', customerLoc);
       const distance = calculateDistance(
         activeDriverLoc.latitude,
         activeDriverLoc.longitude,
@@ -73,6 +78,8 @@ export default function CustomerHome() {
         distance: formatDistance(distance),
         time: calculateETA(distance)
       });
+    } else {
+      console.log('[CustomerHome] Waiting for both locations. driver:', activeDriverLoc, 'customer:', customerLoc);
     }
   }, [activeDriverLoc, customerLoc]);
 
@@ -166,30 +173,33 @@ export default function CustomerHome() {
             </View>
             
             {(activeOrder.status === 'ASSIGNED' || activeOrder.status === 'ACCEPTED') && activeDriverLoc && (
-              <View style={styles.mapPin}>
-                <MapView
-                  style={styles.map}
-                  initialRegion={{
-                    latitude: (activeDriverLoc.latitude + (customerLoc?.latitude || activeDriverLoc.latitude)) / 2,
-                    longitude: (activeDriverLoc.longitude + (customerLoc?.longitude || activeDriverLoc.longitude)) / 2,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
-                  }}
-                  customMapStyle={mapStyle}
-                >
-                  <Marker coordinate={activeDriverLoc}>
-                    <View style={styles.driverMarker}>
-                      <Ionicons name="bicycle" size={16} color="white" />
-                    </View>
-                  </Marker>
-                  {customerLoc && (
+              <View style={[styles.mapPin, { borderWidth: 2, borderColor: '#3b82f6', minHeight: 180, minWidth: 180 }]}> 
+                {(activeDriverLoc && customerLoc) ? (
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
+                      latitude: (activeDriverLoc.latitude + customerLoc.latitude) / 2,
+                      longitude: (activeDriverLoc.longitude + customerLoc.longitude) / 2,
+                      latitudeDelta: 0.02,
+                      longitudeDelta: 0.02,
+                    }}
+                  >
+                    <Marker coordinate={activeDriverLoc}>
+                      <View style={styles.driverMarker}>
+                        <Ionicons name="bicycle" size={16} color="white" />
+                      </View>
+                    </Marker>
                     <Marker coordinate={customerLoc}>
                       <View style={styles.customerMarker}>
                         <Ionicons name="home" size={16} color="white" />
                       </View>
                     </Marker>
-                  )}
-                </MapView>
+                  </MapView>
+                ) : (
+                  <View style={{flex:1, alignItems:'center', justifyContent:'center', height:180}}>
+                    <Text style={{color:'#fff'}}>Waiting for location data...</Text>
+                  </View>
+                )}
               </View>
             )}
             

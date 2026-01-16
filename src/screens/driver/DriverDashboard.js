@@ -10,7 +10,7 @@ import MapView, { Marker } from 'react-native-maps';
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
-import { COLORS, mapStyle, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
+import { COLORS, RADIUS, SHADOWS, SPACING } from '../../constants/theme';
 import { useDeliveryStore } from '../../services/store';
 
 export default function DriverDashboard() {
@@ -150,7 +150,6 @@ export default function DriverDashboard() {
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.01,
                     }}
-                    customMapStyle={mapStyle}
                   >
                     <Marker coordinate={{
                       latitude: driverLoc?.latitude ?? 37.78825,
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   headerLabel: {
-    color: COLORS.textDim,
+    color: COLORS.text,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1,
@@ -261,7 +260,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.l,
   },
   emptyText: {
-    color: COLORS.textDim,
+    color: COLORS.text,
     fontSize: 18,
   },
   jobCard: {
@@ -280,7 +279,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.m,
   },
   jobId: {
-    color: COLORS.textDim,
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -294,7 +293,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16, 185, 129, 0.2)',
   },
   statusText: {
-    color: COLORS.textSecondary,
+    color: COLORS.text,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -306,6 +305,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: SPACING.s,
+  },
+  addressTitle: {
+    color: COLORS.text,
+    fontSize: 16,
+    fontWeight: '600',
   },
   address: {
     color: COLORS.text,
@@ -355,6 +359,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.accent,
   },
+   detailText: {
+  color: COLORS.text
+  },
+  
   completeButton: {
     flex: 1,
     borderRadius: 16,
